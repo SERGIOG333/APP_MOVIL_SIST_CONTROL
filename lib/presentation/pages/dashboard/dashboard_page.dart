@@ -11,9 +11,12 @@ class DashboardMobilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
+      
       backgroundColor: const Color(0xFFD9D9D9),
       body: SafeArea(
+        
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -45,6 +48,7 @@ class DashboardMobilePage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
                         ),
                         SizedBox(height: 4),
@@ -65,7 +69,7 @@ class DashboardMobilePage extends StatelessWidget {
                         );
                       },
                       icon: const Icon(Icons.logout,
-                          size: 28, color: Color(0xFF1565C0)),
+                          size: 28, color: Colors.black),
                       tooltip: "Cerrar sesión",
                     ),
                   ],
@@ -243,7 +247,7 @@ class DashboardMobilePage extends StatelessWidget {
         ],
       ),
       child: ListTile(
-        leading: Icon(icon, color: const Color(0xFF1565C0)),
+        leading: Icon(icon, color: Colors.black),
         title: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(subtitle),
         onTap: onTap,
