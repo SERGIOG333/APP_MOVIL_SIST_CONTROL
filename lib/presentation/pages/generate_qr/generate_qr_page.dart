@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../widgets/labeled_text_field.dart';
 
-class GenerateQrPage extends StatelessWidget {
+class GenerateQrPage extends StatefulWidget {
   const GenerateQrPage({super.key});
+
+  @override
+  State<GenerateQrPage> createState() => _GenerateQrPageState();
+}
+
+class _GenerateQrPageState extends State<GenerateQrPage> {
+  final _nameController = TextEditingController();
+  final _idController = TextEditingController();
+  final _gradeController = TextEditingController();
+  final _emailController = TextEditingController();
+
+  String? qrData; // Contenido del QR
 
   @override
   Widget build(BuildContext context) {
@@ -13,201 +27,108 @@ class GenerateQrPage extends StatelessWidget {
         title: const Text(
           "Generar Código QR",
           style: TextStyle(
-            color: Colors.black, //
+            color: Colors.black,
             fontWeight: FontWeight.bold,
-
-            // 🔹 Usamos el color del tema
           ),
         ),
       ),
-      body: Align(
-        alignment: const Alignment(
-          0,
-          -0.7,
-        ), // x=0 centro horizontal, y=-0.5 hacia arriba
-        child: Container(
-          width: 350,
-          height: 500,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppTheme.cardColor, // 🔹 Fondo blanco
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Informacion del Estudiante",
-                style: TextStyle(fontSize: 11, color: Colors.black),
-                textAlign: TextAlign.left,
-              ),
-              const SizedBox(height: 8),
+      body: SingleChildScrollView(
+        child: Align(
+          alignment: const Alignment(0, -0.7),
+          child: Container(
+            width: 350,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppTheme.cardColor,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Información del Estudiante",
+                  style: TextStyle(fontSize: 12, color: Colors.black),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Completa todos los Campos para Generar el Código QR",
+                  style: TextStyle(fontSize: 11),
+                ),
+                const SizedBox(height: 16),
 
-              const Text(
-                "Completa todos los Campos para Generar el Codigo QR",
-                style: TextStyle(fontSize: 11),
-                textAlign: TextAlign.left,
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Nombre del Estudiante",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                // Campos reutilizando el widget
+                LabeledTextField(
+                  label: "Nombre del Estudiante",
+                  hint: "Ingresa el nombre",
+                  controller: _nameController,
                 ),
-              ),
-              const SizedBox(height: 8),
+                LabeledTextField(
+                  label: "Número de Identidad",
+                  hint: "Ingresa el número de identidad",
+                  controller: _idController,
+                ),
+                LabeledTextField(
+                  label: "Grado",
+                  hint: "Ingresa el grado",
+                  controller: _gradeController,
+                ),
+                LabeledTextField(
+                  label: "Email del padre/madre",
+                  hint: "Ingresa el email",
+                  controller: _emailController,
+                ),
 
-              // 🔹 Caja de texto
-              TextField(
-                
-                decoration: InputDecoration(
-                  
-                  hintText: "Ingresa el nombre",
-                  filled: true,
-                  fillColor: Color(0xFFD9D9D9),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Numero de Identidad",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 8),
+                const SizedBox(height: 20),
 
-              // 🔹 Caja de texto
-              TextField(
-                
-                decoration: InputDecoration(
-                  
-                  hintText: "Ingresa el numero de identidad",
-                  filled: true,
-                  fillColor: Color(0xFFD9D9D9),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Grado",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // 🔹 Caja de texto
-              TextField(
-                
-                decoration: InputDecoration(
-                  
-                  hintText: "Ingresa el grado",
-                  filled: true,
-                  fillColor: Color(0xFFD9D9D9),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Email del padre/madre",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // 🔹 Caja de texto
-              TextField(
-                
-                decoration: InputDecoration(
-                  
-                  hintText: "Ingresa el Email",
-                  filled: true,
-                  fillColor: Color(0xFFD9D9D9),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-    // Botón del mismo ancho
-    SizedBox(
-      width: double.infinity, // Ocupa todo el ancho disponible del container
-      height: 50, // altura del botón
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black, // color azul del tema
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        onPressed: () {
-          // Mostrar alerta
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text("Éxito"),
-                content: const Text("QR creado con éxito"),
-                actions: [
-                  TextButton(
+                // Botón generar QR
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                     onPressed: () {
-                      Navigator.of(context).pop(); // cerrar la alerta
+                      setState(() {
+                        qrData =
+                            "Nombre: ${_nameController.text}\n"
+                            "ID: ${_idController.text}\n"
+                            "Grado: ${_gradeController.text}\n"
+                            "Email: ${_emailController.text}";
+                      });
                     },
-                    child: const Text("OK"),
+                    child: const Text(
+                      "Generar QR",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
-                ],
-              );
-            },
-          );
-        },
-        child: const Text(
-          "Generar QR",
-          style: TextStyle(fontSize: 16, color: Colors.white),
-        ),
-      ),
-    ),
-            ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Mostrar QR si ya fue generado
+                if (qrData != null)
+                  Center(
+                    child: QrImageView(
+                      data: qrData!,
+                      version: QrVersions.auto,
+                      size: 200,
+                      backgroundColor: Colors.white,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
