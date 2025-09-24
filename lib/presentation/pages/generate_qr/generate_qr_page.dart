@@ -23,10 +23,7 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
         backgroundColor: Colors.white,
         title: const Text(
           "Generar Código QR",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -79,7 +76,9 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
                       if (_idController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("Por favor ingresa un número de identificación"),
+                            content: Text(
+                              "Por favor ingresa un número de identificación",
+                            ),
                             backgroundColor: Colors.red,
                           ),
                         );
@@ -87,7 +86,8 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
                       }
 
                       setState(() {
-                        qrData = _idController.text; // Solo el número de identificación
+                        qrData = _idController
+                            .text; // Solo el número de identificación
                       });
                     },
                     child: const Text(

@@ -63,9 +63,7 @@ class _TeachersPageState extends State<TeachersPage> {
             const SizedBox(height: 16),
 
             // 🔍 Barra de búsqueda
-            const SearchBarWidget(
-              hintText: "Buscar por nombre o ID...",
-            ),
+            const SearchBarWidget(hintText: "Buscar por nombre o ID..."),
 
             const SizedBox(height: 20),
 
@@ -78,12 +76,15 @@ class _TeachersPageState extends State<TeachersPage> {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(
-                        child: Text(
-                      "Error: ${snapshot.error}",
-                      style: const TextStyle(color: Colors.red),
-                    ));
+                      child: Text(
+                        "Error: ${snapshot.error}",
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    );
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text("No hay profesores disponibles"));
+                    return const Center(
+                      child: Text("No hay profesores disponibles"),
+                    );
                   }
 
                   final teachers = snapshot.data!;
@@ -93,7 +94,8 @@ class _TeachersPageState extends State<TeachersPage> {
                     itemBuilder: (context, index) {
                       final teacher = teachers[index];
                       return TeacherCard(
-                        name: "${teacher['teacher_name']} ${teacher['teacher_last_name']}",
+                        name:
+                            "${teacher['teacher_name']} ${teacher['teacher_last_name']}",
                         id: "ID: ${teacher['teacher_identificacion']}",
                         email: teacher['teacher_email'],
                         time: "8:15:00 AM", // Ajusta si tienes hora real

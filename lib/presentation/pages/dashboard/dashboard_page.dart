@@ -11,12 +11,9 @@ class DashboardMobilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
-      
       backgroundColor: const Color(0xFFD9D9D9),
       body: SafeArea(
-        
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -63,13 +60,14 @@ class DashboardMobilePage extends StatelessWidget {
                         // 👉 Acción de cerrar sesión
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => const LoginPage(),
-                          ),
+                          MaterialPageRoute(builder: (_) => const LoginPage()),
                         );
                       },
-                      icon: const Icon(Icons.logout,
-                          size: 28, color: Colors.black),
+                      icon: const Icon(
+                        Icons.logout,
+                        size: 28,
+                        color: Colors.black,
+                      ),
                       tooltip: "Cerrar sesión",
                     ),
                   ],
@@ -116,9 +114,7 @@ class DashboardMobilePage extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const GenerateQrPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const GenerateQrPage()),
                   );
                 },
               ),
@@ -129,9 +125,7 @@ class DashboardMobilePage extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const AttendancePage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const AttendancePage()),
                   );
                 },
               ),
@@ -142,9 +136,7 @@ class DashboardMobilePage extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const StudentsPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const StudentsPage()),
                   );
                 },
               ),
@@ -155,9 +147,7 @@ class DashboardMobilePage extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const CoursesPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const CoursesPage()),
                   );
                 },
               ),
@@ -168,9 +158,7 @@ class DashboardMobilePage extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const TeachersPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const TeachersPage()),
                   );
                 },
               ),

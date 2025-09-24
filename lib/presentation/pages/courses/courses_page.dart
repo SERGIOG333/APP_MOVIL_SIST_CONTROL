@@ -61,9 +61,7 @@ class _CoursesPageState extends State<CoursesPage> {
 
             const SizedBox(height: 16),
 
-            const SearchBarWidget(
-              hintText: "Buscar por nombre o ID curso...",
-            ),
+            const SearchBarWidget(hintText: "Buscar por nombre o ID curso..."),
 
             const SizedBox(height: 20),
 
@@ -81,7 +79,9 @@ class _CoursesPageState extends State<CoursesPage> {
                       ),
                     );
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text("No hay cursos disponibles"));
+                    return const Center(
+                      child: Text("No hay cursos disponibles"),
+                    );
                   }
 
                   final courses = snapshot.data!;
