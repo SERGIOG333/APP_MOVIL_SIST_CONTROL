@@ -2,9 +2,24 @@ import 'package:flutter/material.dart';
 import '../../widgets/summary_box.dart';
 import '../../widgets/search_bar.dart';
 import '../../widgets/course_card.dart';
+import '../../../services/course_service.dart';
 
-class CoursesPage extends StatelessWidget {
+class CoursesPage extends StatefulWidget {
   const CoursesPage({super.key});
+
+  @override
+  State<CoursesPage> createState() => _CoursesPageState();
+}
+
+class _CoursesPageState extends State<CoursesPage> {
+  final CourseService _courseService = CourseService();
+  late Future<List<dynamic>> _coursesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _coursesFuture = _courseService.getCourses();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +28,7 @@ class CoursesPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           "Lista de cursos",
-          style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -53,54 +68,41 @@ class CoursesPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             Expanded(
-              child: ListView(
-                children: const [
-                  CourseCard(
-                    name: "Matemáticas",
-                    id: "11A. ID: 1234567890",
-                    teacher: "Profesor Asignado: Pedro",
-                    time: "8:15:00 AM",
-                    status: "ACTIVO",
-                    statusColor: Colors.green,
-                    statusIcon: Icons.check_circle,
-                  ),
-                  CourseCard(
-                    name: "Sociales",
-                    id: "11A. ID: 1234567890",
-                    teacher: "",
-                    time: "8:15:00 AM",
-                    status: "ACTIVO",
-                    statusColor: Colors.green,
-                    statusIcon: Icons.check_circle,
-                  ),
-                  CourseCard(
-                    name: "Química",
-                    id: "11A. ID: 1234567890",
-                    teacher: "",
-                    time: "8:15:00 AM",
-                    status: "ACTIVO",
-                    statusColor: Colors.green,
-                    statusIcon: Icons.check_circle,
-                  ),
-                  CourseCard(
-                    name: "Física",
-                    id: "11A. ID: 1234567890",
-                    teacher: "",
-                    time: "8:15:00 AM",
-                    status: "DESACTIVO",
-                    statusColor: Colors.red,
-                    statusIcon: Icons.cancel,
-                  ),
-                  CourseCard(
-                    name: "Biología",
-                    id: "11A. ID: 1234567890",
-                    teacher: "",
-                    time: "8:15:00 AM",
-                    status: "ACTIVO",
-                    statusColor: Colors.green,
-                    statusIcon: Icons.check_circle,
-                  ),
-                ],
+              child: FutureBuilder<List<dynamic>>(
+                future: _coursesFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        "Error: ${snapshot.error}",
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("No hay cursos disponibles"));
+                  }
+
+                  final courses = snapshot.data!;
+
+                  return ListView.builder(
+                    itemCount: courses.length,
+                    itemBuilder: (context, index) {
+                      final course = courses[index];
+                      return CourseCard(
+                        name: course['course_course_name'] ?? "",
+                        id: "ID: ${course['course_id']}",
+                        teacher:
+                            "Profesor Asignado: ${course['teacher_fk'] ?? "Sin asignar"}",
+                        time: "8:15:00 AM", // Ajusta si tienes hora real
+                        status: "ACTIVO", // Puedes calcular según tu lógica
+                        statusColor: Colors.green,
+                        statusIcon: Icons.check_circle,
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],

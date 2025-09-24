@@ -11,10 +11,7 @@ class GenerateQrPage extends StatefulWidget {
 }
 
 class _GenerateQrPageState extends State<GenerateQrPage> {
-  final _nameController = TextEditingController();
-  final _idController = TextEditingController();
-  final _gradeController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _idController = TextEditingController(); // Solo necesitamos ID
 
   String? qrData; // Contenido del QR
 
@@ -54,36 +51,15 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Información del Estudiante",
+                  "Número de Identificación del Estudiante",
                   style: TextStyle(fontSize: 12, color: Colors.black),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  "Completa todos los Campos para Generar el Código QR",
-                  style: TextStyle(fontSize: 11),
-                ),
-                const SizedBox(height: 16),
 
-                // Campos reutilizando el widget
-                LabeledTextField(
-                  label: "Nombre del Estudiante",
-                  hint: "Ingresa el nombre",
-                  controller: _nameController,
-                ),
                 LabeledTextField(
                   label: "Número de Identidad",
                   hint: "Ingresa el número de identidad",
                   controller: _idController,
-                ),
-                LabeledTextField(
-                  label: "Grado",
-                  hint: "Ingresa el grado",
-                  controller: _gradeController,
-                ),
-                LabeledTextField(
-                  label: "Email del padre/madre",
-                  hint: "Ingresa el email",
-                  controller: _emailController,
                 ),
 
                 const SizedBox(height: 20),
@@ -100,12 +76,18 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
                       ),
                     ),
                     onPressed: () {
+                      if (_idController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Por favor ingresa un número de identificación"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
                       setState(() {
-                        qrData =
-                            "Nombre: ${_nameController.text}\n"
-                            "ID: ${_idController.text}\n"
-                            "Grado: ${_gradeController.text}\n"
-                            "Email: ${_emailController.text}";
+                        qrData = _idController.text; // Solo el número de identificación
                       });
                     },
                     child: const Text(

@@ -20,7 +20,7 @@ class _AttendancePageState extends State<AttendancePage> {
         iconTheme: const IconThemeData(color: Colors.black),
         backgroundColor: Colors.white,
         title: const Text(
-          "Generar Código QR",
+          "Escanear Código QR",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
         ),
       ),
@@ -122,7 +122,7 @@ class _AttendancePageState extends State<AttendancePage> {
 
             const SizedBox(height: 20),
 
-            // 🔹 Segundo container debajo
+            // 🔹 Segundo container debajo con instrucciones fijas
             Container(
               width: 350,
               height: 200,
@@ -141,36 +141,27 @@ class _AttendancePageState extends State<AttendancePage> {
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Intrucciones de Uso",
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                  const SizedBox(height: 10),
+                children: const [
                   Text(
-                    qrText ?? "- Preciona Iniciar Escanear para activar la cámara",
-                    style: const TextStyle(fontSize: 11, ),
+                    "Instrucciones de Uso",
+                    style: TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    qrText ?? "- Pocisiona el código QR frente a la cámara para registrar la asistencia",
-                    style: const TextStyle(fontSize: 11, ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    qrText ?? "- El sistema dectetara automaticamente el codigo",
-                    style: const TextStyle(fontSize: 11, ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    qrText ?? "- Se envia un email inmediato a los padres ",
-                    style: const TextStyle(fontSize: 11, ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    qrText ?? "- El registro quedara guardado en el historial",
-                    style: const TextStyle(fontSize: 11, ),
-                  ),
+                  SizedBox(height: 10),
+                  Text("- Presiona 'Iniciar Escanear' para activar la cámara",
+                      style: TextStyle(fontSize: 11)),
+                  SizedBox(height: 10),
+                  Text("- Posiciona el código QR frente a la cámara para registrar la asistencia",
+                      style: TextStyle(fontSize: 11)),
+                  SizedBox(height: 10),
+                  Text("- El sistema detectará automáticamente el código",
+                      style: TextStyle(fontSize: 11)),
+                  SizedBox(height: 10),
+                  Text("- Se envía un email inmediato a los padres",
+                      style: TextStyle(fontSize: 11)),
+                  SizedBox(height: 10),
+                  Text("- El registro quedará guardado en el historial",
+                      style: TextStyle(fontSize: 11)),
                 ],
               ),
             ),
