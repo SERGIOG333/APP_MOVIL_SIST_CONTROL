@@ -1,7 +1,8 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../widgets/labeled_text_field.dart';
+import '../../../services/student_service.dart';
 
 class GenerateQrPage extends StatefulWidget {
   const GenerateQrPage({super.key});
@@ -11,9 +12,49 @@ class GenerateQrPage extends StatefulWidget {
 }
 
 class _GenerateQrPageState extends State<GenerateQrPage> {
-  final _idController = TextEditingController(); // Solo necesitamos ID
+  final _idController = TextEditingController();
+  Uint8List? qrImage;
+  bool isLoading = false;
 
-  String? qrData; // Contenido del QR
+  Future<void> _generateQr() async {
+    if (_idController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Por favor ingresa un número de identificación"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      final imageBytes = await StudentService().getQrByIdentification(_idController.text);
+
+      if (imageBytes != null) {
+        setState(() {
+          qrImage = imageBytes; // Asignamos la imagen recibida
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("No se encontró estudiante o error al generar QR"),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error al generar QR: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,16 +93,12 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
                   style: TextStyle(fontSize: 12, color: Colors.black),
                 ),
                 const SizedBox(height: 8),
-
                 LabeledTextField(
                   label: "Número de Identidad",
                   hint: "Ingresa el número de identidad",
                   controller: _idController,
                 ),
-
                 const SizedBox(height: 20),
-
-                // Botón generar QR
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -72,41 +109,22 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {
-                      if (_idController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              "Por favor ingresa un número de identificación",
-                            ),
-                            backgroundColor: Colors.red,
+                    onPressed: isLoading ? null : _generateQr,
+                    child: isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            "Generar QR",
+                            style: TextStyle(fontSize: 16, color: Colors.white),
                           ),
-                        );
-                        return;
-                      }
-
-                      setState(() {
-                        qrData = _idController
-                            .text; // Solo el número de identificación
-                      });
-                    },
-                    child: const Text(
-                      "Generar QR",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
-                // Mostrar QR si ya fue generado
-                if (qrData != null)
+                if (qrImage != null)
                   Center(
-                    child: QrImageView(
-                      data: qrData!,
-                      version: QrVersions.auto,
-                      size: 200,
-                      backgroundColor: Colors.white,
+                    child: Image.memory(
+                      qrImage!,
+                      width: 200,
+                      height: 200,
                     ),
                   ),
               ],
