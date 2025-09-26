@@ -6,9 +6,9 @@ class StudentCard extends StatelessWidget {
   final String id;
   final String email;
   final String time;
-  final String status;
-  final Color statusColor;
-  final IconData statusIcon;
+  //final String status;
+  //final Color statusColor;
+  //final IconData statusIcon;
 
   const StudentCard({
     super.key,
@@ -16,9 +16,9 @@ class StudentCard extends StatelessWidget {
     required this.id,
     required this.email,
     required this.time,
-    required this.status,
-    required this.statusColor,
-    required this.statusIcon,
+    //required this.status,
+    //required this.statusColor,
+    //required this.statusIcon,
   });
 
   @override
@@ -63,22 +63,16 @@ class StudentCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(statusIcon, size: 16, color: statusColor),
+                  
                   const SizedBox(width: 4),
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
+                      
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: Text(
-                      status,
-                      style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: statusColor),
-                    ),
+                    
                   ),
                 ],
               ),

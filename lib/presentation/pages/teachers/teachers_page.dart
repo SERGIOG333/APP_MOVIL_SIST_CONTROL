@@ -46,50 +46,50 @@ class _TeachersPageState extends State<TeachersPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 📊 Resumen de profesores
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                SummaryBox(value: "8", label: "Total", color: Colors.black),
-                SummaryBox(value: "2", label: "Presente", color: Colors.green),
-                SummaryBox(value: "5", label: "Salido", color: Colors.orange),
-                SummaryBox(value: "8", label: "Ausente", color: Colors.red),
-              ],
-            ),
+        child: FutureBuilder<List<dynamic>>(
+          future: _teachersFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  "Error: ${snapshot.error}",
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(
+                child: Text("No hay profesores disponibles"),
+              );
+            }
 
-            const SizedBox(height: 16),
+            final teachers = snapshot.data!;
 
-            // 🔍 Barra de búsqueda
-            const SearchBarWidget(hintText: "Buscar por nombre o ID..."),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 📊 Resumen total de profesores
+                SizedBox(
+                  width: double.infinity,
+                  child: SummaryBox(
+                    value: "${teachers.length}",
+                    label: "Total Profesores",
+                    color: Colors.blue,
+                  ),
+                ),
 
-            const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
-            // 📋 Lista de profesores con FutureBuilder
-            Expanded(
-              child: FutureBuilder<List<dynamic>>(
-                future: _teachersFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text(
-                        "Error: ${snapshot.error}",
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                      child: Text("No hay profesores disponibles"),
-                    );
-                  }
+                // 🔍 Barra de búsqueda
+                const SearchBarWidget(
+                    hintText: "Buscar por nombre o ID profesor..."),
 
-                  final teachers = snapshot.data!;
+                const SizedBox(height: 20),
 
-                  return ListView.builder(
+                // 📋 Lista de profesores
+                Expanded(
+                  child: ListView.builder(
                     itemCount: teachers.length,
                     itemBuilder: (context, index) {
                       final teacher = teachers[index];
@@ -98,17 +98,13 @@ class _TeachersPageState extends State<TeachersPage> {
                             "${teacher['teacher_name']} ${teacher['teacher_last_name']}",
                         id: "ID: ${teacher['teacher_identificacion']}",
                         email: teacher['teacher_email'],
-                        time: "8:15:00 AM", // Ajusta si tienes hora real
-                        status: "PRESENTE", // Puedes calcular según tu lógica
-                        statusColor: Colors.green,
-                        statusIcon: Icons.check_circle,
                       );
                     },
-                  );
-                },
-              ),
-            ),
-          ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

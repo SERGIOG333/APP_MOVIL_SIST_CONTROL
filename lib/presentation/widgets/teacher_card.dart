@@ -5,20 +5,20 @@ class TeacherCard extends StatelessWidget {
   final String name;
   final String id;
   final String email;
-  final String time;
-  final String status;
-  final Color statusColor;
-  final IconData statusIcon;
+  //final String time;
+  //final String status;
+  //final Color statusColor;
+  //final IconData statusIcon;
 
   const TeacherCard({
     super.key,
     required this.name,
     required this.id,
     required this.email,
-    required this.time,
-    required this.status,
-    required this.statusColor,
-    required this.statusIcon,
+    //required this.time,
+    //required this.status,
+    //required this.statusColor,
+    //required this.statusIcon,
   });
 
   @override
@@ -63,33 +63,12 @@ class TeacherCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Row(
-                children: [
-                  Icon(statusIcon, size: 16, color: statusColor),
-                  const SizedBox(width: 4),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      status,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: statusColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                time,
-                style: const TextStyle(fontSize: 12, color: Colors.black54),
-              ),
+             
+              // const SizedBox(height: 4),
+              // Text(
+              //   time,
+              //   style: const TextStyle(fontSize: 12, color: Colors.black54),
+              // ),
             ],
           ),
         ],

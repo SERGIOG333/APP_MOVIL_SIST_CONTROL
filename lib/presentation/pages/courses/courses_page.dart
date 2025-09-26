@@ -46,66 +46,67 @@ class _CoursesPageState extends State<CoursesPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 👉 SummaryBox ahora ocupa todo el ancho
-            SizedBox(
-              width: double.infinity,
-              child: const SummaryBox(
-                value: "8",
-                label: "Total Cursos",
-                color: Colors.green,
-              ),
-            ),
+        child: FutureBuilder<List<dynamic>>(
+          future: _coursesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  "Error: ${snapshot.error}",
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(
+                child: Text("No hay cursos disponibles"),
+              );
+            }
 
-            const SizedBox(height: 16),
+            final courses = snapshot.data!;
 
-            const SearchBarWidget(hintText: "Buscar por nombre o ID curso..."),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 👉 SummaryBox ahora sí muestra el total real de cursos
+                SizedBox(
+                  width: double.infinity,
+                  child: SummaryBox(
+                    value: "${courses.length}",
+                    label: "Total Cursos",
+                    color: Colors.green,
+                  ),
+                ),
 
-            const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
-            Expanded(
-              child: FutureBuilder<List<dynamic>>(
-                future: _coursesFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text(
-                        "Error: ${snapshot.error}",
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                      child: Text("No hay cursos disponibles"),
-                    );
-                  }
+                const SearchBarWidget(
+                  hintText: "Buscar por nombre o ID curso...",
+                ),
 
-                  final courses = snapshot.data!;
+                const SizedBox(height: 20),
 
-                  return ListView.builder(
+                Expanded(
+                  child: ListView.builder(
                     itemCount: courses.length,
                     itemBuilder: (context, index) {
                       final course = courses[index];
                       return CourseCard(
                         name: course['course_course_name'] ?? "",
                         id: "ID: ${course['course_id']}",
-                        teacher:
-                            "Profesor Asignado: ${course['teacher_fk'] ?? "Sin asignar"}",
+                        teacher: "Profesor Asignado: ${course['teacher_fk'] ?? "Sin asignar"}",
                         time: "8:15:00 AM", // Ajusta si tienes hora real
-                        status: "ACTIVO", // Puedes calcular según tu lógica
+                        status: "ACTIVO",   // Cambia si necesitas lógica real
                         statusColor: Colors.green,
                         statusIcon: Icons.check_circle,
                       );
                     },
-                  );
-                },
-              ),
-            ),
-          ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

@@ -51,28 +51,17 @@ class _StudentsPageState extends State<StudentsPage> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                // 🔹 Resumen superior (ejemplo básico)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SummaryBox(
-                      value: "${data.length}",
-                      label: "Total",
-                      color: Colors.black,
-                    ),
-                    SummaryBox(
-                      value: "0",
-                      label: "Presente",
-                      color: Colors.green,
-                    ),
-                    SummaryBox(
-                      value: "0",
-                      label: "Salido",
-                      color: Colors.orange,
-                    ),
-                    SummaryBox(value: "0", label: "Ausente", color: Colors.red),
-                  ],
-                ),
+                SizedBox(
+              width: double.infinity,
+              child:  SummaryBox(
+                value: "${data.length}",
+                label: "Total estudiantes",
+                color: Colors.green,
+              ),
+            ),
+                // 
+                //🔹 Resumen superior (ejemplo básico)
+                
 
                 const SizedBox(height: 16),
 
@@ -95,9 +84,9 @@ class _StudentsPageState extends State<StudentsPage> {
                       id: student['student_identificacion'] ?? "N/A",
                       email: student['student_email'] ?? "Sin correo",
                       time: student['student_arrival_time'] ?? "Sin hora",
-                      status: "AUSENTE", // luego lo puedes mapear
-                      statusColor: Colors.red,
-                      statusIcon: Icons.cancel,
+                      //status: "AUSENTE", // luego lo puedes mapear
+                      //statusColor: Colors.red,
+                      //statusIcon: Icons.cancel,
                     );
                   }).toList(),
                 ),
