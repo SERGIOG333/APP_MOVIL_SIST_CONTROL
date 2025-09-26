@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Sist Control',
       theme: AppTheme.lightTheme, // 👈 Aplica el tema global
-      home: const LoginPage(),   // 👈 Pantalla inicial
+      home: const LoginPage(), // 👈 Pantalla inicial
     );
   }
 }

@@ -30,7 +30,8 @@ class _LoginPageState extends State<LoginPage> {
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction, // valida al interactuar
+            autovalidateMode:
+                AutovalidateMode.onUserInteraction, // valida al interactuar
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -81,8 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                       icon: Icon(
                         _obscure ? Icons.visibility : Icons.visibility_off,
                       ),
-                      onPressed: () =>
-                          setState(() => _obscure = !_obscure),
+                      onPressed: () => setState(() => _obscure = !_obscure),
                     ),
                   ),
                   validator: (value) {
