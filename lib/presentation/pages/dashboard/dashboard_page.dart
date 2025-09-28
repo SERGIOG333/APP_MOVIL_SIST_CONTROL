@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import '../courses/courses_page.dart';
 import '../students/students_page.dart';
 import '../teachers/teachers_page.dart';
-import '../attendance/attendance_page.dart';
 import '../generate_qr/generate_qr_page.dart';
 import '../login/login_page.dart';
 import '../../../services/student_service.dart';
-import '../../../services/token_storage.dart'; // 👈 Importar para limpiar token
+import '../../../services/token_storage.dart';
+import '../../../services/attendance_service.dart';
+import '../attendance/page_attendance.dart'; // Aquí es la lista de asistencias
 
 class DashboardMobilePage extends StatefulWidget {
   const DashboardMobilePage({super.key});
@@ -30,16 +31,20 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
 
   Future<void> _loadDashboardData() async {
     try {
+      // Obtener total de estudiantes
       final students = await StudentService().getStudents();
       totalStudents = students.length;
 
+      // Contar estudiantes presentes hoy
       final today = DateTime.now().toIso8601String().substring(0, 10);
       presentStudents = students.where((s) {
         final arrival = s['student_arrival_time'];
         return arrival != null && arrival.toString().startsWith(today);
       }).length;
 
-      totalRegisters = presentStudents;
+      // Obtener total de registros de asistencia
+      final attendances = await AttendanceService().getAllAttendances();
+      totalRegisters = attendances.length;
 
       setState(() {
         isLoading = false;
@@ -69,20 +74,40 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
                     Row(
                       children: [
                         Expanded(
-                          child: _buildStatCard(
-                            title: "total Estudiantes",
-                            value: "$totalStudents",
-                            subtitle: "de $totalStudents estudiantes",
-                            color: Colors.green,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const StudentsPage(),
+                                ),
+                              );
+                            },
+                            child: _buildStatCard(
+                              title: "Total Estudiantes",
+                              value: "$totalStudents",
+                              subtitle: "de $totalStudents estudiantes",
+                              color: Colors.green,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: _buildStatCard(
-                            title: "Registros Hoy",
-                            value: "$totalRegisters",
-                            subtitle: "entradas y salidas",
-                            color: Colors.blue,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const AttendanceListPage(),
+                                ),
+                              );
+                            },
+                            child: _buildStatCard(
+                              title: "Registros Totales",
+                              value: "$totalRegisters",
+                              subtitle: "asistencias registradas",
+                              color: Colors.blue,
+                            ),
                           ),
                         ),
                       ],
@@ -90,8 +115,10 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
                     const SizedBox(height: 24),
                     const Text(
                       "Acciones principales",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     _buildActionTile(
@@ -102,7 +129,8 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const GenerateQrPage()),
+                            builder: (_) => const GenerateQrPage(),
+                          ),
                         );
                       },
                     ),
@@ -114,7 +142,8 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const AttendancePage()),
+                            builder: (_) => const AttendanceListPage(),
+                          ),
                         );
                       },
                     ),
@@ -126,7 +155,8 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const StudentsPage()),
+                            builder: (_) => const StudentsPage(),
+                          ),
                         );
                       },
                     ),
@@ -138,7 +168,8 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const CoursesPage()),
+                            builder: (_) => const CoursesPage(),
+                          ),
                         );
                       },
                     ),
@@ -150,7 +181,21 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const TeachersPage()),
+                            builder: (_) => const TeachersPage(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildActionTile(
+                      icon: Icons.checklist,
+                      label: "Lista de Asistencias",
+                      subtitle: "Ver todas las asistencias registradas",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AttendanceListPage(),
+                          ),
                         );
                       },
                     ),
@@ -161,7 +206,6 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
     );
   }
 
-  // 📌 Encabezado
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -200,7 +244,6 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
           ),
           IconButton(
             onPressed: () async {
-              // ✅ Limpiar token al cerrar sesión
               await TokenStorage.clearToken();
               print("🗑️ Token destruido al cerrar sesión");
 
@@ -217,7 +260,6 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
     );
   }
 
-  // 📌 Tarjeta de estadísticas
   Widget _buildStatCard({
     required String title,
     required String value,
@@ -251,14 +293,15 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
             ),
           ),
           const SizedBox(height: 4),
-          Text(subtitle,
-              style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          Text(
+            subtitle,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
         ],
       ),
     );
   }
 
-  // 📌 Botón de acción
   Widget _buildActionTile({
     required IconData icon,
     required String label,

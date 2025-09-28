@@ -3,7 +3,19 @@ import 'package:http/http.dart' as http;
 import 'token_storage.dart';
 
 class AttendanceService {
-  final String baseUrl = "http://10.0.2.2:3000/api_v1"; // Backend en emulador Android
+  final String baseUrl = "http://10.0.2.2:3000/api_v1";
+  // Obtener todas las asistencias
+  
+  Future<List<dynamic>> getAllAttendances() async {
+    final response = await http.get(Uri.parse('$baseUrl/attendance/'));
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      return jsonData['data'];
+    } else {
+      throw Exception("Error al cargar asistencias: ${response.statusCode}");
+    }
+  } // Backend en emulador Android
 
   /// Registrar asistencia de entrada
   Future<Map<String, dynamic>> registerAttendance(int studentId) async {
