@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // para limitar caracteres
-import '../dashboard/dashboard_page.dart'; // 🔑 Importar Dashboard
+import '../../../services/auth_service.dart';
+import '../../../services/token_storage.dart';
+import '../dashboard/dashboard_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,10 +11,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscure = true;
+  final AuthService _authService = AuthService();
 
   @override
   void dispose() {
@@ -22,116 +23,129 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  /// Método para imprimir el token guardado
+  Future<void> _checkToken() async {
+    final token = await TokenStorage.getToken();
+    print("🔑 TOKEN GUARDADO: $token");
+  }
+
+  Future<void> _loginAdmin() async {
+    try {
+      final result = await _authService.loginAdmin(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      // Guardamos el token en almacenamiento local
+      await TokenStorage.saveToken(result['token']);
+
+      // Imprimimos el token guardado
+      await _checkToken();
+
+      // Si llega aquí, login exitoso
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Bienvenido Admin")),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const DashboardMobilePage()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
+
+  Future<void> _loginUser() async {
+    try {
+      final result = await _authService.loginUser(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      // Guardamos el token en almacenamiento local
+      await TokenStorage.saveToken(result['token']);
+
+      // Imprimimos el token guardado
+      await _checkToken();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Bienvenido Usuario")),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const DashboardMobilePage()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            autovalidateMode:
-                AutovalidateMode.onUserInteraction, // valida al interactuar
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Icon(Icons.school, size: 80, color: Color(0xFF1565C0)),
-                const SizedBox(height: 16),
-                const Text(
-                  "Sist Control",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1565C0),
-                  ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.school, size: 80, color: Color(0xFF1565C0)),
+              const SizedBox(height: 16),
+              const Text(
+                "Sist Control",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1565C0),
                 ),
-                const SizedBox(height: 32),
+              ),
+              const SizedBox(height: 32),
 
-                // 📧 Email
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: "Correo institucional",
-                    prefixIcon: Icon(Icons.email_outlined),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Ingresa tu correo';
-                    }
-                    final v = value.trim();
-                    if (!v.contains('@') || !v.endsWith('.com')) {
-                      return 'El correo debe contener @ y terminar en .com';
-                    }
-                    return null;
-                  },
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: "Correo o Usuario",
+                  prefixIcon: Icon(Icons.person),
                 ),
-                const SizedBox(height: 16),
+              ),
+              const SizedBox(height: 16),
 
-                // 🔑 Contraseña
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscure,
-                  inputFormatters: [LengthLimitingTextInputFormatter(15)],
-                  decoration: InputDecoration(
-                    labelText: "Contraseña",
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscure ? Icons.visibility : Icons.visibility_off,
-                      ),
-                      onPressed: () => setState(() => _obscure = !_obscure),
+              TextField(
+                controller: _passwordController,
+                obscureText: _obscure,
+                decoration: InputDecoration(
+                  labelText: "Contraseña",
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscure ? Icons.visibility : Icons.visibility_off,
                     ),
+                    onPressed: () => setState(() => _obscure = !_obscure),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Ingresa la contraseña';
-                    }
-                    if (value.length < 8) {
-                      return 'La contraseña debe tener al menos 8 caracteres';
-                    }
-                    if (value.length > 15) {
-                      return 'La contraseña no puede tener más de 15 caracteres';
-                    }
-                    return null;
-                  },
                 ),
-                const SizedBox(height: 24),
+              ),
+              const SizedBox(height: 24),
 
-                // 🚀 Botón de iniciar sesión
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // ✅ Navegar al Dashboard y reemplazar Login
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DashboardMobilePage(),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Corrige los errores del formulario'),
-                        ),
-                      );
-                    }
-                  },
-                  child: const Text("Iniciar Sesión"),
-                ),
+              // Botón Admin
+              ElevatedButton(
+                onPressed: _loginAdmin,
+                child: const Text("Iniciar como Admin"),
+              ),
+              const SizedBox(height: 12),
 
-                const SizedBox(height: 16),
-
-                TextButton(
-                  onPressed: () {
-                    // Aquí podrías navegar a una vista de recuperación de contraseña
-                  },
-                  child: const Text("¿Olvidaste tu contraseña?"),
-                ),
-              ],
-            ),
+              // Botón Usuario
+              ElevatedButton(
+                onPressed: _loginUser,
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                child: const Text("Iniciar como Usuario"),
+              ),
+            ],
           ),
         ),
       ),
