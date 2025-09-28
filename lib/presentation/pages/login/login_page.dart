@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.school, size: 80, color: Color(0xFF1565C0)),
+               Image.asset('assets/icon/icono_sist_control.png', height: 80, width: 80),
               const SizedBox(height: 16),
               const Text(
                 "Sist Control",
