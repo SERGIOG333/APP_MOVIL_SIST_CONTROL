@@ -6,6 +6,7 @@ import '../attendance/attendance_page.dart';
 import '../generate_qr/generate_qr_page.dart';
 import '../login/login_page.dart';
 import '../../../services/student_service.dart';
+import '../../../services/token_storage.dart'; // 👈 Importar para limpiar token
 
 class DashboardMobilePage extends StatefulWidget {
   const DashboardMobilePage({super.key});
@@ -29,18 +30,15 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
 
   Future<void> _loadDashboardData() async {
     try {
-      // 👉 Traer estudiantes desde el servicio
       final students = await StudentService().getStudents();
       totalStudents = students.length;
 
-      // 👉 Calcular presentes de hoy (arrivalTime que empiece con la fecha actual)
       final today = DateTime.now().toIso8601String().substring(0, 10);
       presentStudents = students.where((s) {
         final arrival = s['student_arrival_time'];
         return arrival != null && arrival.toString().startsWith(today);
       }).length;
 
-      // 👉 Total registros de hoy (ejemplo simple = presentes)
       totalRegisters = presentStudents;
 
       setState(() {
@@ -66,17 +64,14 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 📌 Encabezado
                     _buildHeader(context),
                     const SizedBox(height: 16),
-
-                    // 📌 Tarjetas resumen
                     Row(
                       children: [
                         Expanded(
                           child: _buildStatCard(
-                            title: "Presentes de Hoy",
-                            value: "$presentStudents",
+                            title: "total Estudiantes",
+                            value: "$totalStudents",
                             subtitle: "de $totalStudents estudiantes",
                             color: Colors.green,
                           ),
@@ -92,7 +87,6 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 24),
                     const Text(
                       "Acciones principales",
@@ -100,7 +94,6 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
-
                     _buildActionTile(
                       icon: Icons.qr_code,
                       label: "Generar QR Estudiante",
@@ -206,7 +199,11 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
             ],
           ),
           IconButton(
-            onPressed: () {
+            onPressed: () async {
+              // ✅ Limpiar token al cerrar sesión
+              await TokenStorage.clearToken();
+              print("🗑️ Token destruido al cerrar sesión");
+
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const LoginPage()),
