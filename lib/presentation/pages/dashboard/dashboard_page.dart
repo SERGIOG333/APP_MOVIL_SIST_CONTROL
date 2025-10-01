@@ -7,7 +7,8 @@ import '../login/login_page.dart';
 import '../../../services/student_service.dart';
 import '../../../services/token_storage.dart';
 import '../../../services/attendance_service.dart';
-import '../attendance/page_attendance.dart'; // Aquí es la lista de asistencias
+import '../attendance/page_attendance.dart';
+import '../attendance/attendance_page.dart'; // Aquí es la lista de asistencias
 
 class DashboardMobilePage extends StatefulWidget {
   const DashboardMobilePage({super.key});
@@ -142,7 +143,7 @@ class _DashboardMobilePageState extends State<DashboardMobilePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const AttendanceListPage(),
+                            builder: (_) => const AttendancePage(),
                           ),
                         );
                       },
