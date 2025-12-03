@@ -14,11 +14,41 @@ class CoursesPage extends StatefulWidget {
 class _CoursesPageState extends State<CoursesPage> {
   final CourseService _courseService = CourseService();
   late Future<List<dynamic>> _coursesFuture;
+  List<dynamic> _allCourses = [];
+  List<dynamic> _filteredCourses = [];
+  String _searchQuery = "";
 
   @override
   void initState() {
     super.initState();
+    _loadCourses();
+  }
+
+  void _loadCourses() {
     _coursesFuture = _courseService.getCourses();
+    _coursesFuture.then((courses) {
+      setState(() {
+        _allCourses = courses;
+        _filteredCourses = courses;
+      });
+    });
+  }
+
+  void _filterCourses(String query) {
+    setState(() {
+      _searchQuery = query.toLowerCase();
+      
+      if (_searchQuery.isEmpty) {
+        _filteredCourses = _allCourses;
+      } else {
+        _filteredCourses = _allCourses.where((course) {
+          final courseName = (course['course_course_name'] ?? "").toLowerCase();
+          final courseId = course['course_id'].toString().toLowerCase();
+          
+          return courseName.contains(_searchQuery) || courseId.contains(_searchQuery);
+        }).toList();
+      }
+    });
   }
 
   @override
@@ -64,16 +94,13 @@ class _CoursesPageState extends State<CoursesPage> {
               );
             }
 
-            final courses = snapshot.data!;
-
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 👉 SummaryBox ahora sí muestra el total real de cursos
                 SizedBox(
                   width: double.infinity,
                   child: SummaryBox(
-                    value: "${courses.length}",
+                    value: "${_allCourses.length}",
                     label: "Total Cursos",
                     color: Colors.green,
                   ),
@@ -81,29 +108,40 @@ class _CoursesPageState extends State<CoursesPage> {
 
                 const SizedBox(height: 16),
 
-                const SearchBarWidget(
+                SearchBarWidget(
                   hintText: "Buscar por nombre o ID curso...",
+                  onChanged: _filterCourses,
                 ),
 
                 const SizedBox(height: 20),
 
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: courses.length,
-                    itemBuilder: (context, index) {
-                      final course = courses[index];
-                      return CourseCard(
-                        name: course['course_course_name'] ?? "",
-                        id: "ID: ${course['course_id']}",
-                        teacher: "Profesor Asignado: ${course['teacher_fk'] ?? "Sin asignar"}",
-                        time: "8:15:00 AM", // Ajusta si tienes hora real
-                        status: "ACTIVO",   // Cambia si necesitas lógica real
-                        statusColor: Colors.green,
-                        statusIcon: Icons.check_circle,
-                      );
-                    },
+                if (_filteredCourses.isEmpty && _searchQuery.isNotEmpty)
+                  const Expanded(
+                    child: Center(
+                      child: Text(
+                        "No se encontraron cursos",
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      ),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _filteredCourses.length,
+                      itemBuilder: (context, index) {
+                        final course = _filteredCourses[index];
+                        return CourseCard(
+                          name: course['course_course_name'] ?? "",
+                          id: "ID: ${course['course_id']}",
+                          teacher: "Profesor Asignado: ${course['teacher_fk'] ?? "Sin asignar"}",
+                          time: "8:15:00 AM",
+                          status: "ACTIVO",
+                          statusColor: Colors.green,
+                          statusIcon: Icons.check_circle,
+                        );
+                      },
+                    ),
                   ),
-                ),
               ],
             );
           },

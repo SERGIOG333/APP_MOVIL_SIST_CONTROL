@@ -14,11 +14,49 @@ class TeachersPage extends StatefulWidget {
 class _TeachersPageState extends State<TeachersPage> {
   final TeacherService _teacherService = TeacherService();
   late Future<List<dynamic>> _teachersFuture;
+  List<dynamic> _allTeachers = [];
+  List<dynamic> _filteredTeachers = [];
+  String _searchQuery = "";
 
   @override
   void initState() {
     super.initState();
+    _loadTeachers();
+  }
+
+  void _loadTeachers() {
     _teachersFuture = _teacherService.getTeachers();
+    _teachersFuture.then((teachers) {
+      setState(() {
+        _allTeachers = teachers;
+        _filteredTeachers = teachers;
+      });
+    });
+  }
+
+  void _filterTeachers(String query) {
+    setState(() {
+      _searchQuery = query.toLowerCase();
+
+      if (_searchQuery.isEmpty) {
+        _filteredTeachers = _allTeachers;
+      } else {
+        _filteredTeachers = _allTeachers.where((teacher) {
+          final teacherName = (teacher['teacher_name'] ?? "").toLowerCase();
+          final teacherLastName = (teacher['teacher_last_name'] ?? "")
+              .toLowerCase();
+          final fullName = "$teacherName $teacherLastName";
+          final teacherId = (teacher['teacher_identificacion'] ?? "")
+              .toString()
+              .toLowerCase();
+          final teacherEmail = (teacher['teacher_email'] ?? "").toLowerCase();
+
+          return fullName.contains(_searchQuery) ||
+              teacherId.contains(_searchQuery) ||
+              teacherEmail.contains(_searchQuery);
+        }).toList();
+      }
+    });
   }
 
   @override
@@ -59,21 +97,16 @@ class _TeachersPageState extends State<TeachersPage> {
                 ),
               );
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(
-                child: Text("No hay profesores disponibles"),
-              );
+              return const Center(child: Text("No hay profesores disponibles"));
             }
-
-            final teachers = snapshot.data!;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 📊 Resumen total de profesores
                 SizedBox(
                   width: double.infinity,
                   child: SummaryBox(
-                    value: "${teachers.length}",
+                    value: "${_allTeachers.length}",
                     label: "Total Profesores",
                     color: Colors.blue,
                   ),
@@ -81,27 +114,37 @@ class _TeachersPageState extends State<TeachersPage> {
 
                 const SizedBox(height: 16),
 
-                // 🔍 Barra de búsqueda
-                const SearchBarWidget(
-                    hintText: "Buscar por nombre o ID profesor..."),
+                SearchBarWidget(
+                  hintText: "Buscar por nombre o ID profesor...",
+                  onChanged: _filterTeachers,
+                ),
 
                 const SizedBox(height: 20),
 
-                // 📋 Lista de profesores
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: teachers.length,
-                    itemBuilder: (context, index) {
-                      final teacher = teachers[index];
-                      return TeacherCard(
-                        name:
-                            "${teacher['teacher_name']} ${teacher['teacher_last_name']}",
-                        id: "ID: ${teacher['teacher_identificacion']}",
-                        email: teacher['teacher_email'],
-                      );
-                    },
+                if (_filteredTeachers.isEmpty && _searchQuery.isNotEmpty)
+                  const Expanded(
+                    child: Center(
+                      child: Text(
+                        "No se encontraron profesores",
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      ),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _filteredTeachers.length,
+                      itemBuilder: (context, index) {
+                        final teacher = _filteredTeachers[index];
+                        return TeacherCard(
+                          name:
+                              "${teacher['teacher_name']} ${teacher['teacher_last_name']}",
+                          id: "ID: ${teacher['teacher_identificacion']}",
+                          email: teacher['teacher_email'],
+                        );
+                      },
+                    ),
                   ),
-                ),
               ],
             );
           },

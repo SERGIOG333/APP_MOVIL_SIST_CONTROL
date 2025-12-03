@@ -16,14 +16,15 @@ class StudentService {
     }
   }
 
-  // método para consultar por identificación
-   Future<Uint8List?> getQrByIdentification(String identification) async {
-    final response = await http.get(Uri.parse('$baseUrl/student/$identification/qr'));
+  Future<Uint8List?> getQrByIdentification(String identification) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/student/$identification/qr'),
+    );
 
     if (response.statusCode == 200) {
-      return response.bodyBytes; // Retorna la imagen en bytes
+      return response.bodyBytes;
     }
 
-    return null; // Si no existe o hay error
+    return null;
   }
 }

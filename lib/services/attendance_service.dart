@@ -33,7 +33,7 @@ class AttendanceService {
     final data = jsonDecode(response.body);
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return data; // ✅ Acepta 200, 201, 204...
+      return data; //  Acepta 200, 201, 204...
     } else {
       throw Exception(data["message"] ?? "Error al registrar asistencia");
     }
@@ -55,7 +55,7 @@ class AttendanceService {
     final data = jsonDecode(response.body);
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return data; // ✅ Acepta 200, 201, 204...
+      return data; //  Acepta 200, 201, 204...
     } else {
       throw Exception(data["message"] ?? "Error al registrar salida");
     }

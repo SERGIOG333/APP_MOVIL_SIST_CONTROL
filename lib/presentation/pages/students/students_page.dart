@@ -13,12 +13,50 @@ class StudentsPage extends StatefulWidget {
 
 class _StudentsPageState extends State<StudentsPage> {
   final StudentService _studentService = StudentService();
-  late Future<List<dynamic>> students;
+  late Future<List<dynamic>> _studentsFuture;
+  List<dynamic> _allStudents = [];
+  List<dynamic> _filteredStudents = [];
+  String _searchQuery = "";
 
   @override
   void initState() {
     super.initState();
-    students = _studentService.getStudents();
+    _loadStudents();
+  }
+
+  void _loadStudents() {
+    _studentsFuture = _studentService.getStudents();
+    _studentsFuture.then((students) {
+      setState(() {
+        _allStudents = students;
+        _filteredStudents = students;
+      });
+    });
+  }
+
+  void _filterStudents(String query) {
+    setState(() {
+      _searchQuery = query.toLowerCase();
+
+      if (_searchQuery.isEmpty) {
+        _filteredStudents = _allStudents;
+      } else {
+        _filteredStudents = _allStudents.where((student) {
+          final studentName = (student['student_name'] ?? "").toLowerCase();
+          final studentLastName = (student['student_last_name'] ?? "")
+              .toLowerCase();
+          final fullName = "$studentName $studentLastName";
+          final studentId = (student['student_identificacion'] ?? "")
+              .toString()
+              .toLowerCase();
+          final studentEmail = (student['student_email'] ?? "").toLowerCase();
+
+          return fullName.contains(_searchQuery) ||
+              studentId.contains(_searchQuery) ||
+              studentEmail.contains(_searchQuery);
+        }).toList();
+      }
+    });
   }
 
   @override
@@ -35,7 +73,7 @@ class _StudentsPageState extends State<StudentsPage> {
         centerTitle: true,
       ),
       body: FutureBuilder<List<dynamic>>(
-        future: students,
+        future: _studentsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -45,51 +83,48 @@ class _StudentsPageState extends State<StudentsPage> {
             return const Center(child: Text("No hay estudiantes"));
           }
 
-          final data = snapshot.data!;
-
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
                 SizedBox(
-              width: double.infinity,
-              child:  SummaryBox(
-                value: "${data.length}",
-                label: "Total estudiantes",
-                color: Colors.green,
-              ),
-            ),
-                // 
-                //🔹 Resumen superior (ejemplo básico)
-                
+                  width: double.infinity,
+                  child: SummaryBox(
+                    value: "${_allStudents.length}",
+                    label: "Total estudiantes",
+                    color: Colors.green,
+                  ),
+                ),
 
                 const SizedBox(height: 16),
 
-                // 🔹 Barra de búsqueda
                 SearchBarWidget(
                   hintText: "Buscar por nombre o ID...",
-                  onChanged: (value) {
-                    print("Buscando: $value");
-                  },
+                  onChanged: _filterStudents,
                 ),
 
                 const SizedBox(height: 16),
 
-                // 🔹 Lista de estudiantes desde API
-                Column(
-                  children: data.map((student) {
-                    return StudentCard(
-                      name:
-                          "${student['student_name']} ${student['student_last_name']}",
-                      id: student['student_identificacion'] ?? "N/A",
-                      email: student['student_email'] ?? "Sin correo",
-                      time: student['student_arrival_time'] ?? "Sin hora",
-                      //status: "AUSENTE", // luego lo puedes mapear
-                      //statusColor: Colors.red,
-                      //statusIcon: Icons.cancel,
-                    );
-                  }).toList(),
-                ),
+                if (_filteredStudents.isEmpty && _searchQuery.isNotEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: Text(
+                      "No se encontraron estudiantes",
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
+                    ),
+                  )
+                else
+                  Column(
+                    children: _filteredStudents.map((student) {
+                      return StudentCard(
+                        name:
+                            "${student['student_name']} ${student['student_last_name']}",
+                        id: student['student_identificacion'] ?? "N/A",
+                        email: student['student_email'] ?? "Sin correo",
+                        time: student['student_arrival_time'] ?? "Sin hora",
+                      );
+                    }).toList(),
+                  ),
               ],
             ),
           );
